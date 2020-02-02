@@ -101,10 +101,10 @@ class NN:
         # calculate deltas
         for idx,layer in enumerate(reversed(self.network)):
             level = len(self.network) - idx - 1
-            for node in layer:
+            for nodeI,node in enumerate(layer):
                 # behave different for last level
                 if level == self.n_levels - 1:
-                    node.dcda = sum(delta_cost)
+                    node.dcda = delta_cost[nodeI]
                 else:
                     
                     laterLayer = self.network[level + 1]
@@ -115,7 +115,7 @@ class NN:
 #                        for weight in node.inputWeights:
 #                            node.dcda += weight.a * node.dadz * laterNode.dcda
                         
-                    node.dadz = delta_sigmoid(node.output)
+                    node.dadz = delta_sigmoid(node.input)
                     node.dzdb = 1
                     node.dcdb = node.dcda * node.dadz * node.dzdb
                     
@@ -228,7 +228,32 @@ class Weight:
     
     def __repr__(self):
         return str(self)
-        
+
+def get_biases(nodeList):
+    v = []
+    for n in nodeList:
+        v.append(n.bias)
+    return v
+
+def get_inputs(nodeList):
+    v = []
+    for n in nodeList:
+        v.append(n.input)
+    return v
+
+def get_outputs(nodeList):
+    v = []
+    for n in nodeList:
+        v.append(n.output)
+    return v
+
+def get_weightVals(nodeList):
+    v = []
+    for n in nodeList:
+        for w in n.inputWeights:
+            v.append(w.a)
+    return v
+
 
 # converts number n ranging from 1-9 to an array of zeros but with the nth
 # index as one 
