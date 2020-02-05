@@ -6,10 +6,11 @@ import pickle
 # create class to generate neural network
 class NN:
     
-    def __init__(self, shape=[784,300,100,10], alpha=0.01, log_file=None):
+    def __init__(self, shape=[784,300,100,10], alpha=0.01, beta=0.0, log_file=None):
         
         if log_file == None:
             self.alpha = alpha
+            self.beta = beta
             self.shape = shape
             self.n_levels = len(shape)
             self.zero_az()
@@ -38,6 +39,10 @@ class NN:
             self.dw = x.dw
             self.db = x.db
             self.costLog = x.costLog
+            if hasattr(x, 'beta'):
+                self.beta = x.beta
+            else:
+                self.beta = 0
             
             
     
@@ -50,6 +55,10 @@ class NN:
             self.z.append(np.zeros([self.shape[i],1], dtype='float'))
     
     def init_wb(self):
+        
+        # set seed for consistency
+        np.random.seed(22345)
+        
         self.w = []
         for i in range(1, self.n_levels):
             rands = np.random.rand(self.shape[i], self.shape[i-1]) * 2 - 1
@@ -60,9 +69,7 @@ class NN:
             self.b.append(rands)
         
     def zero_deltas(self):
-        self.da = []
-        for i in range(self.n_levels):
-            self.da.append(np.zeros([self.shape[i],1], dtype='float'))
+        self.zero_da()
         self.dz = []
         for i in range(self.n_levels):
             self.dz.append(np.zeros([self.shape[i],1], dtype='float'))
@@ -72,6 +79,11 @@ class NN:
         self.db = []
         for i in range(1,self.n_levels):
             self.db.append(np.zeros([self.shape[i],1], dtype='float'))
+    
+    def zero_da(self):
+        self.da = []
+        for i in range(self.n_levels):
+            self.da.append(np.zeros([self.shape[i],1], dtype='float'))
     
     
     def train(self, submit, expected):
@@ -88,21 +100,21 @@ class NN:
         
         
         # backpropogation
-        self.zero_deltas() # may not need
         self.da[self.n_levels - 1] = delta_cost
         for L in reversed(range(self.n_levels - 1)):
             # dz
             self.dz[L] = self.delta_sigmoid(self.z[L]) * self.da[L + 1]
             
             # db
-            self.db[L] = self.dz[L] * 1
+            # self.db[L] = self.dz[L] * 1
+            self.db[L] = self.dz[L] * 1 + self.db[L] * self.beta
             
             # dw
             for k in range(self.w[L].shape[1]):
-                self.dw[L][:,k] = self.a[L][k]
-                self.dw[L][:,k] *= np.squeeze(self.dz[L])
+                self.dw[L][:,k] = self.a[L][k] * np.squeeze(self.dz[L]) + self.dw[L][:,k] * self.beta
             
             # da
+            self.zero_da()
             for j in range(self.w[L].shape[0]):
                 for k in range(self.w[L].shape[1]):
                     self.da[L][k] += self.w[L][j,k] * self.dz[L][j]
@@ -118,7 +130,6 @@ class NN:
         if submit.shape != (784,1): # fix this so it isn't hard coded
             raise Exception("Submitted data must match the shape of the network's self.a[0]")
         
-        self.zero_az() # may not need
         self.a[0] = submit
         for i in range(self.n_levels-1):
             self.z[i] = np.matmul(self.w[i], self.a[i]) + self.b[i]

@@ -8,18 +8,16 @@ import pickle
 from NN import *
 from nn_tools import *
 
-# set seed for consistency
-np.random.seed(22345)
-
 # load data
 data = get_data('train-images-idx3-ubyte', 'train-labels-idx1-ubyte')
 ims = data['ims']
 labs = data['labs']
 
-x = NN(shape=[784,300,100,10], alpha=0.1)
+x = NN(shape=[784,300,100,10], alpha=0.1, beta=0.99)
+#x = NN(log_file='values_fullRun_alpha1e-1_4Levels_2020-02-04_07_30.pckl')
 
 before = datetime.datetime.now()
-runs = 3
+runs = 60000
 for i in range(runs):
     submit = np.expand_dims(ims[i,:], 1) / 255
     expected = label_2_array(labs[i])
@@ -43,5 +41,5 @@ fname = os.path.join(os.getcwd(), 'logs', 'values_' + fname + '.pckl')
 
 with open(fname, 'wb') as fid:
     pickle.dump(x, fid)
-
-# trained_n = NN(log_file='values_fullRun_alpha1e-1_4Levels_2020-02-04_07_30.pckl')
+#
+## trained_n = NN(log_file='values_fullRun_alpha1e-1_4Levels_2020-02-04_07_30.pckl')
