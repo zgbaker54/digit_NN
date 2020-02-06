@@ -13,8 +13,9 @@ data = get_data('train-images-idx3-ubyte', 'train-labels-idx1-ubyte')
 ims = data['ims']
 labs = data['labs']
 
-x = NN(shape=[784,300,100,10], alpha=0.1, beta=0.99)
+#x = NN(shape=[784,300,100,10], alpha=0.1, beta=0.3)
 #x = NN(log_file='values_fullRun_alpha1e-1_4Levels_2020-02-04_07_30.pckl')
+x = NN(log_file='values_2ndFullRun_alpha1e-1_4Levels_2020-02-05_04_51.pckl')
 
 before = datetime.datetime.now()
 runs = 60000
