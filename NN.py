@@ -127,7 +127,7 @@ class NN:
     def propogate(self, submit):
         
         # ensure submit is properly shaped
-        if submit.shape != (784,1): # fix this so it isn't hard coded
+        if submit.shape != (self.shape[0], 1):
             raise Exception("Submitted data must match the shape of the network's self.a[0]")
         
         self.a[0] = submit
