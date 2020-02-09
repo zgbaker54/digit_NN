@@ -18,7 +18,8 @@ x = NN()
 #x = NN(log_file='values_fullRun_alpha1e-2_2020-02-03_08_07.pckl')
 #x = NN(log_file='values_fullRun_alpha1e-1_4Levels_2020-02-04_07_30.pckl')
 #x = NN(log_file='values_2ndFullRun_alpha1e-1_4Levels_2020-02-05_04_51.pckl')
-x = NN(log_file='values_3rdFullRun_alpha1e-1_4Levels_2020-02-06_15_44.pckl')
+#x = NN(log_file='values_3rdFullRun_alpha1e-1_4Levels_2020-02-06_15_44.pckl')
+x = NN(log_file='values_4thFullRun_alpha1e-1_4Levels_2020-02-08_10_05.pckl')
 
 misses = 0
 
@@ -35,6 +36,6 @@ for i in range(runs):
     if guess != actual:
         misses += 1
 
-plt.imshow(np.reshape(data['ims'][i], [28,28]))
+#plt.imshow(np.reshape(data['ims'][i], [28,28]))
 
 print(100 * misses/runs)
